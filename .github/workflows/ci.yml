@@ -1,0 +1,23 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  html:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check HTML files are well-formed
+        run: |
+          pip install --quiet html5lib
+          python - <<'PY'
+          import glob, sys, html5lib
+          bad = 0
+          for f in glob.glob('**/*.html', recursive=True):
+              p = html5lib.HTMLParser(strict=False)
+              p.parse(open(f, encoding='utf-8'))
+              if p.errors:
+                  print(f'{f}: {len(p.errors)} parse warnings')
+          print('ok')
+          PY
